@@ -1,1 +1,21 @@
-teste
+# Sistema de Gestão de Veículos, Entregas e Funcionários 🚚📦👨‍💼
+
+Este é um sistema simples para gerenciar veículos, entregas, funcionários e clientes, utilizando a linguagem **C** e manipulação de arquivos binários.
+
+## 📌 Funcionalidades
+- Adicionar, listar e atualizar veículos.
+- Adicionar e listar entregas.
+- Adicionar e listar funcionários.
+- Adicionar e listar clientes.
+
+## 🚀 Como compilar e executar
+
+### 1️⃣ **Clonar o repositório**
+```sh
+git clone https://github.com/seu-usuario/Programa-aoAlgoritmo.git
+cd Programa-aoAlgoritmo
+
+### 1️⃣ **Compilar o programao**
+```sh
+O projeto usa um Makefile, então basta rodar:
+mingw32-make
