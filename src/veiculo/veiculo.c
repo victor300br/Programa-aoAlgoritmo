@@ -1,16 +1,18 @@
 #include <stdio.h>
 #include <string.h>
-#include "veiculo.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include "veiculo.h"
 
 #define VEICULOS_FILE "bin/veiculos.dat"
+
 
 int obterProximoId() {
     FILE *file = fopen(VEICULOS_FILE, "rb");
     if (file == NULL) {
         return 1;
     }
+
     Veiculo veiculo;
     int ultimoId = 0;
 
@@ -19,46 +21,61 @@ int obterProximoId() {
             ultimoId = veiculo.id;
         }
     }
-    fclose(file);
 
+    fclose(file);
     return ultimoId + 1;
 }
+
+
 void adicionarVeiculo(const char* tipo, float capacidade, const char* status) {
     Veiculo veiculo;
     veiculo.id = obterProximoId();
-    strcpy(veiculo.tipo, tipo);
+    strncpy(veiculo.tipo, tipo, sizeof(veiculo.tipo) - 1);
     veiculo.capacidade = capacidade;
-    strcpy(veiculo.status, status);
+    strncpy(veiculo.status, status, sizeof(veiculo.status) - 1);
 
     FILE *file = fopen(VEICULOS_FILE, "ab");
-    if (file != NULL) {
-        fwrite(&veiculo, sizeof(Veiculo), 1, file);
-        fclose(file);
-        printf("Veiculo adicionado com sucesso! ID: %d\n", veiculo.id);
-    } else {
+    if (file == NULL) {
         printf("Erro ao abrir o arquivo para escrita.\n");
         return;
     }
+
+    fwrite(&veiculo, sizeof(Veiculo), 1, file);
+    fclose(file);
+
+    printf("Veiculo adicionado com sucesso! ID: %d\n", veiculo.id);
     sleep(3);
 }
 
+
 void listarVeiculos() {
-    Veiculo veiculo;
     FILE *file = fopen(VEICULOS_FILE, "rb");
-    if (file != NULL) {
-        while (fread(&veiculo, sizeof(Veiculo), 1, file)) {
-            printf("ID: %d, Tipo: %s, Capacidade: %.2f kg, Status: %s\n",
-                   veiculo.id, veiculo.tipo, veiculo.capacidade, veiculo.status);
-        }
-        fclose(file);
-    } else {
+    if (file == NULL) {
         printf("Erro ao abrir o arquivo de veículos.\n");
+        return;
+    }
+
+    Veiculo veiculo;
+    int encontrado = 0;
+
+    while (fread(&veiculo, sizeof(Veiculo), 1, file)) {
+          printf("ID: %d, Tipo: %s, Capacidade: %.2f kg, Status: %s\n",
+          veiculo.id, veiculo.tipo, veiculo.capacidade, veiculo.status);
+          encontrado = 1;
+
+    }
+
+    fclose(file);
+
+    if (!encontrado) {
+        printf("Nenhum veiculo ativo encontrado.\n");
     }
 
     printf("\nPressione qualquer tecla para continuar...");
     getchar();
     getchar();
 }
+
 
 void atualizarVeiculo(int id) {
     FILE *file = fopen(VEICULOS_FILE, "rb+");
@@ -74,11 +91,9 @@ void atualizarVeiculo(int id) {
         if (veiculo.id == id) {
             encontrado = 1;
 
-
             printf("Dados atuais do veiculo:\n");
             printf("ID: %d\nTipo: %s\nCapacidade: %.2f kg\nStatus: %s\n\n",
                    veiculo.id, veiculo.tipo, veiculo.capacidade, veiculo.status);
-
 
             printf("Novo tipo (ex: Caminhao): ");
             scanf("%s", veiculo.tipo);
@@ -103,4 +118,102 @@ void atualizarVeiculo(int id) {
         printf("Nenhum veiculo encontrado com o ID informado.\n");
         sleep(3);
     }
+}
+
+
+void excluirVeiculo(int id) {
+
+    FILE *file = fopen(VEICULOS_FILE, "rb+");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de veiculos.\n");
+        return;
+    }
+
+
+    Veiculo veiculo;
+    int encontrado = 0;
+    long int posicaoExclusao = -1;
+
+    while (fread(&veiculo, sizeof(Veiculo), 1, file)) {
+        if (veiculo.id == id) {
+            encontrado = 1;
+            posicaoExclusao = ftell(file) - sizeof(Veiculo);
+            break;
+        }
+    }
+
+
+    if (!encontrado) {
+        printf("Nao existe veiculo com o ID %d.\n", id);
+        sleep(2);
+        fclose(file);
+        return;
+    }
+
+
+    fseek(file, -sizeof(Veiculo), SEEK_END);
+    long int posicaoUltimo = ftell(file);
+    fread(&veiculo, sizeof(Veiculo), 1, file);
+
+    if (posicaoExclusao != posicaoUltimo) {
+        fseek(file, posicaoExclusao, SEEK_SET);
+        fwrite(&veiculo, sizeof(Veiculo), 1, file);
+    }
+
+
+    ftruncate(fileno(file), posicaoUltimo);
+
+
+    fclose(file);
+    printf("Veiculo com ID %d excluido com sucesso!\n", id);
+    sleep(2);
+}
+
+
+
+int compararID(const void *a, const void *b) {
+    Veiculo *veiculoA = (Veiculo *)a;
+    Veiculo *veiculoB = (Veiculo *)b;
+    return veiculoA->id - veiculoB->id;
+}
+
+void ordenarVeiculosID() {
+    FILE *file = fopen(VEICULOS_FILE, "rb+");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de veiculos.\n");
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    int numVeiculos = fileSize / sizeof(Veiculo);
+    fseek(file, 0, SEEK_SET);
+
+
+    Veiculo *veiculos = (Veiculo *)malloc(numVeiculos * sizeof(Veiculo));
+    if (veiculos == NULL) {
+        printf("Erro ao alocar memoria.\n");
+        fclose(file);
+        return;
+    }
+
+    fread(veiculos, sizeof(Veiculo), numVeiculos, file);
+    fclose(file);
+
+    qsort(veiculos, numVeiculos, sizeof(Veiculo), compararID);
+
+    file = fopen(VEICULOS_FILE, "rb+");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        free(veiculos);
+        return;
+    }
+
+    fwrite(veiculos, sizeof(Veiculo), numVeiculos, file);
+    fclose(file);
+
+    free(veiculos);
+
+    printf("Veiculos ordenados por ID com sucesso!\n");
+    sleep(1);
 }
