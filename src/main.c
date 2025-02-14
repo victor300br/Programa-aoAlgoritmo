@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "veiculo/veiculo.h"
 #include "entrega/entrega.h"
@@ -23,6 +24,10 @@ void menu() {
         printf("10. Adicionar Cliente\n");
         printf("11. Listar Clientes\n");
         printf("12. Atualizar Cliente\n");
+        printf("13. Excluir Veiculo.\n");
+        printf("14. Excluir Funcionario.\n");
+        printf("15. Excluir Cliente.\n");
+        printf("16. Excluir Entrega.\n");
         printf("0. Sair\n");
 
         scanf("%d", &escolha);
@@ -56,13 +61,12 @@ void menu() {
                 char origem[50], destino[50];
                 float tempoEstimado;
                 printf("Origem: ");
-                scanf("%s", origem);
-                printf("Destino: ");
-                scanf("%s", destino);
-                printf("Tempo estimado: ");
+    			scanf(" %[^\n]", origem);
+    			printf("Destino: ");
+    			scanf(" %[^\n]", destino);
+                printf("Tempo estimado (em horas): ");
                 scanf("%f", &tempoEstimado);
                 adicionarEntrega(origem, destino, tempoEstimado);
-
                 break;
             }
             case 5:
@@ -79,7 +83,7 @@ void menu() {
             case 7: {
                 system("cls");
                 char nome[100];
-                printf("Nome do funcionário: ");
+                printf("Nome do funcionario: ");
                 scanf(" %[^\n]", nome);
                 adicionarFuncionario(nome);
                 break;
@@ -91,7 +95,7 @@ void menu() {
             case 9:
                 system("cls");
                 int idFuncionario;
-                printf("ID do funcionário a ser atualizado: ");
+                printf("ID do funcionario a ser atualizado: ");
                 scanf("%d", &idFuncionario);
                 atualizarFuncionario(idFuncionario);
                 break;
@@ -100,9 +104,9 @@ void menu() {
                 char nome[100], endereco[200], tipoServico[20];
                 printf("Nome do Cliente: ");
                 scanf(" %[^\n]", nome);
-                printf("Endereço: ");
+                printf("Endereco: ");
                 scanf(" %[^\n]", endereco);
-                printf("Tipo de Serviço (econômico/padrão/premium): ");
+                printf("Tipo de Servico (economico/padrao/premium): ");
                 scanf(" %[^\n]", tipoServico);
                 adicionarCliente(nome, endereco, tipoServico);
                 break;
@@ -118,6 +122,34 @@ void menu() {
                 scanf("%d", &idCliente);
                 atualizarCliente(idCliente);
                 break;
+            case 13 :
+                system("cls");
+                int idVeiculoExcluido;
+                printf("ID do veiculo a ser excluido:  ");
+                scanf("%d", &idVeiculoExcluido);
+                excluirVeiculo(idVeiculoExcluido);
+            break;
+            case 14:
+              system("cls");
+              int idFuncionarioExcluido;
+              printf("ID do funcionario a ser excluido:  ");
+              scanf("%d", &idFuncionarioExcluido);
+              excluirFuncionario(idFuncionarioExcluido);
+            break;
+            case 15:
+              system("cls");
+              int idClienteExcluido;;
+              printf("ID do cliente a ser excluido:  ");
+              scanf("%d", &idClienteExcluido);
+              excluirCliente(idClienteExcluido);
+            break;
+            case 16:
+              system("cls");
+              int idEntregaExcluido;
+              printf("ID da entrega a ser excluida:  ");
+              scanf("%d", &idEntregaExcluido);
+              excluirEntrega(idEntregaExcluido);
+            break;
             case 0:
                 printf("Saindo...\n");
                 return;

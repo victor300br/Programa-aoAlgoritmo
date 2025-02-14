@@ -11,5 +11,6 @@ typedef struct {
 void adicionarEntrega(const char* origem, const char* destino, float tempoEstimado);
 void listarEntregas();
 void atualizarEntrega(int id);
+void excluirEntrega(int id);
 
 #endif

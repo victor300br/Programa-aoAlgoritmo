@@ -30,6 +30,7 @@ void adicionarEntrega(const char* origem, const char* destino, float tempoEstima
     strcpy(entrega.origem, origem);
     strcpy(entrega.destino, destino);
     entrega.tempoEstimado = tempoEstimado;
+    sleep(1);
 
     FILE *file = fopen(ENTREGAS_FILE, "ab");
     if (file != NULL) {
@@ -80,9 +81,9 @@ void atualizarEntrega(int id) {
                    entrega.id, entrega.origem, entrega.destino, entrega.tempoEstimado);
 
             printf("Nova origem: ");
-            scanf("%s", entrega.origem);
+            scanf(" %[^\n]", entrega.origem);
             printf("Novo destino: ");
-            scanf("%s", entrega.destino);
+            scanf(" %[^\n]", entrega.destino);
             printf("Novo tempo estimado (em horas): ");
             scanf("%f", &entrega.tempoEstimado);
 
@@ -103,3 +104,49 @@ void atualizarEntrega(int id) {
         sleep(3);
     }
 }
+void excluirEntrega(int id) {
+  FILE *file = fopen(ENTREGAS_FILE, "rb+");
+  if (file == NULL) {
+    printf("Erro ao abrir o arquivo de entregas.\n");
+  }
+    Entrega entrega;
+    int encontrado = 0;
+    long int posicaoExclusao = -1;
+
+    while (fread(&entrega, sizeof(Entrega), 1, file)) {
+        if (entrega.id == id) {
+            encontrado = 1;
+            posicaoExclusao = ftell(file) - sizeof(Entrega);
+            break;
+        }
+    }
+
+
+    if (!encontrado) {
+        printf("Nao existe entrega com esse ID %d.\n", id);
+        sleep(2);
+        fclose(file);
+        return;
+    }
+
+
+    fseek(file, -sizeof(Entrega), SEEK_END);
+    long int posicaoUltimo = ftell(file);
+    fread(&entrega, sizeof(Entrega), 1, file);
+
+    if (posicaoExclusao != posicaoUltimo) {
+        fseek(file, posicaoExclusao, SEEK_SET);
+        fwrite(&entrega, sizeof(Entrega), 1, file);
+    }
+
+
+    ftruncate(fileno(file), posicaoUltimo);
+
+
+    fclose(file);
+    printf("Entrega com ID %d excluido com sucesso!\n", id);
+    sleep(2);
+}
+
+
+

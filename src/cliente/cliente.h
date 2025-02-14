@@ -11,5 +11,6 @@ typedef struct {
 void adicionarCliente(const char* nome, const char* endereco, const char* tipoServico);
 void listarClientes();
 void atualizarCliente(int id);
+void excluirCliente(int id);
 
 #endif

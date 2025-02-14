@@ -48,7 +48,7 @@ void listarClientes() {
     FILE *file = fopen(CLIENTES_FILE, "rb");
     if (file != NULL) {
         while (fread(&cliente, sizeof(Cliente), 1, file)) {
-            printf("ID: %d, Nome: %s, Endereço: %s, Tipo de Serviço: %s\n",
+            printf("ID: %d, Nome: %s, Endereco: %s, Tipo de Servico: %s\n",
                    cliente.id, cliente.nome, cliente.endereco, cliente.tipoServico);
         }
         fclose(file);
@@ -76,14 +76,14 @@ void atualizarCliente(int id) {
             encontrado = 1;
 
             printf("Dados atuais do cliente:\n");
-            printf("ID: %d\nNome: %s\nEndereço: %s\nTipo de Serviço: %s\n\n",
+            printf("ID: %d\nNome: %s\nEndereco: %s\nTipo de Servico: %s\n\n",
                    cliente.id, cliente.nome, cliente.endereco, cliente.tipoServico);
 
             printf("Novo nome: ");
             scanf(" %[^\n]", cliente.nome);
-            printf("Novo endereço: ");
+            printf("Novo endereco: ");
             scanf(" %[^\n]", cliente.endereco);
-            printf("Novo tipo de serviço (econômico/padrão/premium): ");
+            printf("Novo tipo de servico (economico/padrao/premium): ");
             scanf(" %[^\n]", cliente.tipoServico);
 
             fseek(file, -sizeof(Cliente), SEEK_CUR);
@@ -102,4 +102,50 @@ void atualizarCliente(int id) {
         printf("Nenhum cliente encontrado com o ID informado.\n");
         sleep(3);
     }
+}
+
+void excluirCliente(int id) {
+  FILE *file = fopen(CLIENTES_FILE, "rb+");
+  if (file == NULL) {
+    printf("Erro ao abrir o arquivo de clientes.\n");
+    return;
+  }
+
+    Cliente cliente;
+    int encontrado = 0;
+    long int posicaoExclusao = -1;
+
+    while (fread(&cliente, sizeof(Cliente), 1, file)) {
+        if (cliente.id == id) {
+            encontrado = 1;
+            posicaoExclusao = ftell(file) - sizeof(Cliente);
+            break;
+        }
+    }
+
+
+    if (!encontrado) {
+        printf("Nao existe cliente com esse ID %d.\n", id);
+        sleep(2);
+        fclose(file);
+        return;
+    }
+
+
+    fseek(file, -sizeof(Cliente), SEEK_END);
+    long int posicaoUltimo = ftell(file);
+    fread(&cliente, sizeof(Cliente), 1, file);
+
+    if (posicaoExclusao != posicaoUltimo) {
+        fseek(file, posicaoExclusao, SEEK_SET);
+        fwrite(&cliente, sizeof(Cliente), 1, file);
+    }
+
+
+    ftruncate(fileno(file), posicaoUltimo);
+
+
+    fclose(file);
+    printf("Cliente com ID %d excluido com sucesso!\n", id);
+    sleep(2);
 }

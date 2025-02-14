@@ -144,7 +144,7 @@ void excluirVeiculo(int id) {
 
 
     if (!encontrado) {
-        printf("Nao existe veiculo com o ID %d.\n", id);
+        printf("Nao existe veiculo com esse ID %d.\n", id);
         sleep(2);
         fclose(file);
         return;
@@ -170,50 +170,3 @@ void excluirVeiculo(int id) {
 }
 
 
-
-int compararID(const void *a, const void *b) {
-    Veiculo *veiculoA = (Veiculo *)a;
-    Veiculo *veiculoB = (Veiculo *)b;
-    return veiculoA->id - veiculoB->id;
-}
-
-void ordenarVeiculosID() {
-    FILE *file = fopen(VEICULOS_FILE, "rb+");
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo de veiculos.\n");
-        return;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    int numVeiculos = fileSize / sizeof(Veiculo);
-    fseek(file, 0, SEEK_SET);
-
-
-    Veiculo *veiculos = (Veiculo *)malloc(numVeiculos * sizeof(Veiculo));
-    if (veiculos == NULL) {
-        printf("Erro ao alocar memoria.\n");
-        fclose(file);
-        return;
-    }
-
-    fread(veiculos, sizeof(Veiculo), numVeiculos, file);
-    fclose(file);
-
-    qsort(veiculos, numVeiculos, sizeof(Veiculo), compararID);
-
-    file = fopen(VEICULOS_FILE, "rb+");
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo para escrita.\n");
-        free(veiculos);
-        return;
-    }
-
-    fwrite(veiculos, sizeof(Veiculo), numVeiculos, file);
-    fclose(file);
-
-    free(veiculos);
-
-    printf("Veiculos ordenados por ID com sucesso!\n");
-    sleep(1);
-}

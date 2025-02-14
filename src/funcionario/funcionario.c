@@ -33,7 +33,7 @@ void adicionarFuncionario(const char* nome) {
     if (file != NULL) {
         fwrite(&funcionario, sizeof(Funcionario), 1, file);
         fclose(file);
-        printf("Funcionário adicionado com sucesso! ID: %d\n", funcionario.id);
+        printf("Funcionario adicionado com sucesso! ID: %d\n", funcionario.id);
     } else {
         printf("Erro ao abrir o arquivo para escrita.\n");
         return;
@@ -50,7 +50,7 @@ void listarFuncionarios() {
         }
         fclose(file);
     } else {
-        printf("Erro ao abrir o arquivo de funcionários.\n");
+        printf("Erro ao abrir o arquivo de funcionarios.\n");
     }
 
     printf("\nPressione qualquer tecla para continuar...");
@@ -61,7 +61,7 @@ void listarFuncionarios() {
 void atualizarFuncionario(int id) {
     FILE *file = fopen(FUNCIONARIOS_FILE, "rb+");
     if (file == NULL) {
-        printf("Erro ao abrir o arquivo de funcionários.\n");
+        printf("Erro ao abrir o arquivo de funcionarios.\n");
         return;
     }
 
@@ -72,7 +72,7 @@ void atualizarFuncionario(int id) {
         if (funcionario.id == id) {
             encontrado = 1;
 
-            printf("Dados atuais do funcionário:\n");
+            printf("Dados atuais do funcionario:\n");
             printf("ID: %d\nNome: %s\n\n", funcionario.id, funcionario.nome);
 
             printf("Novo nome: ");
@@ -82,7 +82,7 @@ void atualizarFuncionario(int id) {
             fwrite(&funcionario, sizeof(Funcionario), 1, file);
             fclose(file);
 
-            printf("\nFuncionário atualizado com sucesso!\n");
+            printf("\nFuncionario atualizado com sucesso!\n");
             sleep(1);
             return;
         }
@@ -91,7 +91,47 @@ void atualizarFuncionario(int id) {
     fclose(file);
 
     if (!encontrado) {
-        printf("Nenhum funcionário encontrado com o ID informado.\n");
+        printf("Nenhum funcionario encontrado com o ID informado.\n");
         sleep(3);
     }
+}
+
+void excluirFuncionario(int id) {
+  FILE *file = fopen(FUNCIONARIOS_FILE, "rb+");
+  if (file == NULL) {
+    printf("Arquivo nao encontrado!\n");
+    return;
+  }
+
+  Funcionario funcionario;
+  int encontrado = 0;
+  long int IdExcluido = -1;
+
+  while(fread(&funcionario, sizeof(Funcionario), 1, file)) {
+    if (funcionario.id == id) {
+      encontrado = 1;
+      IdExcluido = ftell(file) - sizeof(Funcionario);
+      break;
+    }
+  }
+
+    if (!encontrado) {
+      printf("Nao existe funcionario com esse ID %d.\n", id);
+      sleep(2);
+      fclose(file);
+      return;
+  }
+    fseek(file, -sizeof(Funcionario), SEEK_END);
+    long int posicaoUltimo = ftell(file);
+    fread(&funcionario, sizeof(Funcionario), 1, file);
+
+    if (IdExcluido != posicaoUltimo) {
+        fseek(file, IdExcluido, SEEK_SET);
+        fwrite(&funcionario, sizeof(Funcionario), 1, file);
+    }
+
+    ftruncate(fileno(file),posicaoUltimo);
+    fclose(file);
+    printf("Funcionario com ID %d excluido com sucesso!\n", id);
+    sleep(2);
 }

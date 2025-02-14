@@ -9,5 +9,5 @@ typedef struct {
 void adicionarFuncionario(const char* nome);
 void listarFuncionarios();
 void atualizarFuncionario(int id);
-
+void excluirFuncionario(int id);
 #endif
