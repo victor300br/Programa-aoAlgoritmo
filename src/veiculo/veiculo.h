@@ -8,7 +8,10 @@ typedef struct {
     char status[10];
 } Veiculo;
 
+
+
 void adicionarVeiculo(const char* tipo, float capacidade, const char* status);
 void listarVeiculos();
 void atualizarVeiculo(int id);
+void excluirVeiculo(int id);
 #endif

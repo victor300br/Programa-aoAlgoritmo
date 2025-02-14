@@ -1,9 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -I src/veiculo
+CFLAGS = -Wall -Wextra -pedantic -I src/veiculo -I src/entrega -I src/funcionario -I src/cliente
 
 SRC = src/main.c \
       src/veiculo/veiculo.c \
-
+      src/entrega/entrega.c \
+      src/funcionario/funcionario.c \
+      src/cliente/cliente.c
 
 OBJ = $(SRC:.c=.o)
 
