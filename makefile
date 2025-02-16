@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -I src/veiculo -I src/entrega -I src/funcionario -I src/cliente
+LDFLAGS = -mconsole
 
 SRC = src/main.c \
       src/veiculo/veiculo.c \
@@ -14,7 +15,7 @@ EXEC = sistema_gestao
 all: $(EXEC)
 
 $(EXEC): $(OBJ)
-	$(CC) $(OBJ) -o $(EXEC)
+	$(CC) $(OBJ) -o $(EXEC) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
