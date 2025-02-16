@@ -8,9 +8,19 @@ typedef struct {
     float tempoEstimado;
 } Entrega;
 
+typedef struct {
+    int entregaId;
+    int funcionarioId;
+    int veiculoId;
+    int clienteId;
+    float tempoTotal;
+} EntregaConcluidas;
+
 void adicionarEntrega(const char* origem, const char* destino, float tempoEstimado);
 void listarEntregas();
 void atualizarEntrega(int id);
 void excluirEntrega(int id);
+void planejarEExecutarEGerarRelatorioEntrega(int entregaId, int funcionarioId, int veiculoId, int clienteId, float tempoTotal);
+void listarRelatoriosEntregas();
 
 #endif
